@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,7 +24,11 @@ import kotlinx.coroutines.withContext
 private const val PRIME_LIMIT = 1_000_000
 
 @Composable
-fun ProfilerTestScreen(modifier: Modifier = Modifier) {
+fun ProfilerTestScreen(
+    modifier: Modifier = Modifier,
+    // Подменяется в UI-тестах, чтобы контролировать момент окончания расчёта
+    backgroundDispatcher: CoroutineDispatcher = Dispatchers.Default
+) {
     val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("Нажмите кнопку") }
@@ -42,7 +47,7 @@ fun ProfilerTestScreen(modifier: Modifier = Modifier) {
                     isLoading = true
                     status = "Вычисляем..."
                     val start = System.currentTimeMillis()
-                    val count = withContext(Dispatchers.Default) {
+                    val count = withContext(backgroundDispatcher) {
                         countPrimesUpTo(PRIME_LIMIT)
                     }
                     val elapsed = System.currentTimeMillis() - start
